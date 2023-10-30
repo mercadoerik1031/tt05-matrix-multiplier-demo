@@ -1,60 +1,71 @@
-`default_nettype none
+default_nettype none
 
-module tt_um_seven_segment_seconds #( parameter MAX_COUNT = 24'd10_000_000 ) (
-    input  wire [7:0] ui_in,    // Dedicated inputs - connected to the input switches
-    output wire [7:0] uo_out,   // Dedicated outputs - connected to the 7 segment display
-    input  wire [7:0] uio_in,   // IOs: Bidirectional Input path
-    output wire [7:0] uio_out,  // IOs: Bidirectional Output path
-    output wire [7:0] uio_oe,   // IOs: Bidirectional Enable path (active high: 0=input, 1=output)
-    input  wire       ena,      // will go high when the design is enabled
-    input  wire       clk,      // clock
-    input  wire       rst_n     // reset_n - low to reset
+module tt_um_seven_segment_seconds(
+    input  wire [7:0] ui_in,
+    output reg  [7:0] uo_out,
+    input  wire [7:0] uio_in,
+    output reg  [7:0] uio_out,
+    output wire [7:0] uio_oe,
+    input  wire       ena,
+    input  wire       clk,
+    input  wire       rst_n
 );
 
-    wire reset = ! rst_n;
-    wire [6:0] led_out;
-    assign uo_out[6:0] = led_out;
-    assign uo_out[7] = 1'b0;
+    wire reset = !rst_n;
+    wire error_flag;
+    
+    // Split ui_in for Matrix A elements
+    wire signed [1:0] a11 = ui_in[1:0];
+    wire signed [1:0] a12 = ui_in[3:2];
+    wire signed [1:0] a21 = ui_in[5:4];
+    wire signed [1:0] a22 = ui_in[7:6];
 
-    // use bidirectionals as outputs
-    assign uio_oe = 8'b11111111;
+    // Set uio_in as input initially
+    assign uio_oe = 8'b00000000;
 
-    // put bottom 8 bits of second counter out on the bidirectional gpio
-    assign uio_out = second_counter[7:0];
+    // Split uio_in for Matrix B elements
+    wire signed [1:0] b11 = uio_in[1:0];
+    wire signed [1:0] b12 = uio_in[3:2];
+    wire signed [1:0] b21 = uio_in[5:4];
+    wire signed [1:0] b22 = uio_in[7:6];
 
-    // external clock is 10MHz, so need 24 bit counter
-    reg [23:0] second_counter;
-    reg [3:0] digit;
+    // Check all aij & bij in range (-2, 2)
+    assign error_flag = (a11 <= -2 || a11 >= 2) ||
+                        (a12 <= -2 || a12 >= 2) ||
+                        (a21 <= -2 || a21 >= 2) ||
+                        (a22 <= -2 || a22 >= 2) ||
+                        (b11 <= -2 || b11 >= 2) ||
+                        (b12 <= -2 || b12 >= 2) ||
+                        (b21 <= -2 || b21 >= 2) ||
+                        (b22 <= -2 || b22 >= 2);
 
-    // if external inputs are set then use that as compare count
-    // otherwise use the hard coded MAX_COUNT
-    wire [23:0] compare = ui_in == 0 ? MAX_COUNT: {6'b0, ui_in[7:0], 10'b0};
-
-    always @(posedge clk) begin
-        // if reset, set counter to 0
-        if (reset) begin
-            second_counter <= 0;
-            digit <= 0;
+    always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        uo_out <= 8'b0;
+        uio_out <= 8'b0;
+    end else if (ena) begin
+        if (error_flag) begin
+            uo_out <= 8'b0;
+            uio_out <= 8'b0;
         end else begin
-            // if up to 16e6
-            if (second_counter == compare) begin
-                // reset
-                second_counter <= 0;
-
-                // increment digit
-                digit <= digit + 1'b1;
-
-                // only count from 0 to 9
-                if (digit == 9)
-                    digit <= 0;
-
-            end else
-                // increment counter
-                second_counter <= second_counter + 1'b1;
+            // 2 x 2 matrix multiplication logic
+            uo_out[3:0] <= a11 * b11 + a12 * b21;
+            uo_out[7:4] <= a11 * b12 + a12 * b22;
+            uio_out[3:0] <= a21 * b11 + a22 * b21;
+            uio_out[7:4] <= a21 * b12 + a22 * b22;
         end
     end
+end
 
-    // instantiate segment display
-    seg7 seg7(.counter(digit), .segments(led_out));
+    // Set uio_eo as outputs after multiplication
+    assign uio_oe = (ena) ? 8'b11111111 : 8'b00000000;
 
 endmodule
+
+/*
+Input Ports -> Matrix Elements Extractor -> Validity Checker -> Matrix Multiplier -> Output Setter -> Output Ports
+                                                                    ^
+                                                                    |
+                                                               Control Logic
+
+*/
