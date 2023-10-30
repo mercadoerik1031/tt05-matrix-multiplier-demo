@@ -28,24 +28,28 @@ module tb ();
         uio_in = 8'b00000000; // Initial value: all zeros
     end
 
-    // Test Vectors for the design
-    initial begin
-        #15;
-        ena = 1;
-        ui_in = 8'b01101110; // Example value: 1, 1, -1, 2
-        uio_in = 8'b11010101; // Example value: -1, 1, -1, 1
-        #10;
-        ui_in = 8'b10011001; // Another example value: 2, -1, -1, -1
-        uio_in = 8'b01100110; // Another example value: 1, 0, 1, 2
-        #10;
-        ena = 0;
-        #10;
-        ena = 1;
-        ui_in = 8'b10110101; // Yet another example value: 2, 1, -1, 1
-        uio_in = 8'b01101101; // Yet another example value: 1, 1, 1, -1
-        #100;
-        $finish;  // End the simulation after some time
-    end
+   // Test Vectors for the design
+initial begin
+    // #15;
+    // ena = 1;
+    // ui_in = 8'b01101110; // 1, 1, -1, 2
+    // uio_in = 8'b11010101; // -1, 1, -1, 1
+    // #10;
+    // ui_in = 8'b10011001; // 2, -1, -1, -1
+    // uio_in = 8'b01100110; // 1, 0, 1, 2
+    // #10;
+    // ena = 0;
+    // #10;
+    // ena = 1;
+    // ui_in = 8'b10110101; // 2, 1, -1, 1
+    // uio_in = 8'b01101101; // 1, 1, 1, -1
+    #10;
+    // Adding the new test case from Python
+    ui_in = 8'b00100010; // 2, 2, 2, 2
+    uio_in = 8'b00100010; // 2, 2, 2, 2
+    #100;
+    $finish;  // End the simulation after some time
+end
 
     // wire up the inputs and outputs
     reg  clk;
