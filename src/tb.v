@@ -44,11 +44,11 @@ initial begin
     // ui_in = 8'b10110101; // 2, 1, -1, 1
     // uio_in = 8'b01101101; // 1, 1, 1, -1
     #10;
-    // Adding the new test case from Python
+    ena = 1
     ui_in = 8'b00100010; // 2, 2, 2, 2
     uio_in = 8'b00100010; // 2, 2, 2, 2
     #100;
-    $finish;  // End the simulation after some time
+    $finish;  // End the simulation
 end
 
     // wire up the inputs and outputs

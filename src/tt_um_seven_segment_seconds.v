@@ -44,6 +44,7 @@ module tt_um_seven_segment_seconds(
         uo_out <= 8'b0;
         uio_out <= 8'b0;
     end else if (ena) begin
+        $display("a11=%b, a12=%b, b11=%b, b12=%b", a11, a12, b11, b12)
         if (error_flag) begin
             uo_out <= 8'b0;
             uio_out <= 8'b0;
