@@ -13,11 +13,11 @@ async def test_matrix_multiplier(dut):
     await ClockCycles(dut.clk, 1)
     dut.rst_n.value = 1
 
-    # Test cases (add more as required)
     test_matrices = [
-        {"A": 0b00010010, "B": 0b01010101, "expected_out": 0b01110111},
-        
-    ]
+    {"A": 0b00100010, "B": 0b00100010, "expected_out": 0b1000100010001000},
+    # Add more test cases as needed
+]
+
 
     for test_case in test_matrices:
         # Set input values
@@ -41,4 +41,3 @@ async def test_matrix_multiplier(dut):
         await ClockCycles(dut.clk, 1)
         dut.rst_n.value = 1
 
-    dut._log.info("Matrix multiplier test finished successfully!")
