@@ -21,7 +21,7 @@ module tt_um_seven_segment_seconds(
     wire signed [1:0] a22 = ui_in[7:6];
 
     // Set uio_in as input initially
-    assign uio_in = 8'b00000000;
+    // assign uio_in = 8'b00000000;
 
     // Split uio_in for Matrix B elements
     wire signed [1:0] b11 = uio_in[1:0];
