@@ -61,11 +61,3 @@ end
     assign uio_oe = (ena) ? 8'b11111111 : 8'b00000000;
 
 endmodule
-
-/*
-Input Ports -> Matrix Elements Extractor -> Validity Checker -> Matrix Multiplier -> Output Setter -> Output Ports
-                                                                    ^
-                                                                    |
-                                                               Control Logic
-
-*/
