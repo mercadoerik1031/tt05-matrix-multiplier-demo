@@ -43,9 +43,6 @@ module tb ();
         ena = 1;
         matrixA_in = 8'b10110101; // Yet another example value: 2, 1, -1, 1
         matrixB_in = 8'b01101101; // Yet another example value: 1, 1, 1, -1
-        #10
-        matrixA_in = 0b00100010
-        matrixB_in = 0b00100010
         #100;
         $finish;  // End the simulation after some time
     end
