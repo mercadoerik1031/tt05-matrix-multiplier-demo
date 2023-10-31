@@ -45,7 +45,7 @@ async def test_matrix_multiplier(dut):
     await RisingEdge(dut.clk)
     dut.rst_n.value = 1
     await RisingEdge(dut.clk)
-    dut.ena.value = 1`
+    dut.ena.value = 1
 
 
     # Main test logic
