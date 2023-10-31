@@ -12,7 +12,7 @@ async def test_matrix_multiplier(dut):
 
     test_matrices = [
         # Add test cases here
-        {"A": 0b00000010, "B": 0b00000010, "expected_out": 0b0000001000000010},
+        {"A": 0b00000010, "B": 0b00000010, "expected_out": 0b0000000000000100},
         # ...
     ]
 
