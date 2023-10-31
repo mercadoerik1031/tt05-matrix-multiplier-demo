@@ -25,7 +25,7 @@ async def test_matrix_multiplier(dut):
         # Enable the multiplier
         dut.ena.value = 1
        
-        for _ in range(5):
+        for _ in range(10):
             await RisingEdge(dut.clk)
             
         dut.ena.value = 0
