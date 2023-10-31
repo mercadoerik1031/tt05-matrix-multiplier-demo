@@ -36,16 +36,17 @@ async def test_matrix_multiplier(dut):
     """Test for matrix multiplication logic."""
 
     # Set initial values
-    dut.ena <= 0
-    dut.ui_in <= 0
-    dut.uio_in <= 0
-    dut.rst_n <= 0
+    dut.ena.value = 0
+    dut.ui_in.value = 0
+    dut.uio_in.value = 0
+    dut.rst_n.value = 0
 
     # Apply reset
     await RisingEdge(dut.clk)
-    dut.rst_n <= 1
+    dut.rst_n.value = 1
     await RisingEdge(dut.clk)
-    dut.ena <= 1
+    dut.ena.value = 1`
+
 
     # Main test logic
     for test_case in test_matrices:
