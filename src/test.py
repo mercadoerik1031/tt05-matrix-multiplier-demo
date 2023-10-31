@@ -5,7 +5,7 @@ from cocotb.triggers import RisingEdge, FallingEdge, Timer, ClockCycles
 @cocotb.test()
 async def test_matrix_multiplier(dut):
     dut._log.info("Starting matrix multiplier test")
-    clock = Clock(dut.clk, 10, units="us")  # Adjust clock period if needed
+    clock = Clock(dut.clk, 100, units="us")
     cocotb.start_soon(clock.start())
 
     # Reset the design
@@ -20,7 +20,6 @@ async def test_matrix_multiplier(dut):
     {"A": 0b00000001, "B": 0b00001000, "expected_out": 0b0000001000000010},  # Arbitrary Values
     # Add more test cases as needed
 ]
-
 
     for test_case in test_matrices:
         # Set input values
