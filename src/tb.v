@@ -21,36 +21,6 @@ module tb ();
         rst_n = 1;
     end
 
-    // Initialization of Signals
-    initial begin
-        ena = 0;
-        ui_in = 8'b00000000; // Initial value: all zeros
-        uio_in = 8'b00000000; // Initial value: all zeros
-    end
-
-   // Test Vectors for the design
-initial begin
-    // #15;
-    // ena = 1;
-    // ui_in = 8'b01101110; // 1, 1, -1, 2
-    // uio_in = 8'b11010101; // -1, 1, -1, 1
-    // #10;
-    // ui_in = 8'b10011001; // 2, -1, -1, -1
-    // uio_in = 8'b01100110; // 1, 0, 1, 2
-    // #10;
-    // ena = 0;
-    // #10;
-    // ena = 1;
-    // ui_in = 8'b10110101; // 2, 1, -1, 1
-    // uio_in = 8'b01101101; // 1, 1, 1, -1
-    #10;
-    ena = 1;
-    ui_in = 8'b00100010; // 2, 2, 2, 2
-    uio_in = 8'b00100010; // 2, 2, 2, 2
-    #100;
-    $finish;  // End the simulation
-end
-
     // wire up the inputs and outputs
     reg  clk;
     reg  rst_n;
