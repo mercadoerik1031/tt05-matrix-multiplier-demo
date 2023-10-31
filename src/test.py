@@ -36,7 +36,7 @@ async def test_matrix_multiplier(dut):
     dut._log.info("Starting matrix multiplier test")
 
     # Start the clock
-    clock = Clock(dut.clk, 100, units="us")  # Assuming a 10 MHz clock frequency
+    clock = Clock(dut.clk, 100, units="us")
     cocotb.start_soon(clock.start())
 
     # Set initial values
@@ -48,7 +48,7 @@ async def test_matrix_multiplier(dut):
     # Apply reset
     await RisingEdge(dut.clk)
     dut.rst_n.value = 1
-    await RisingEdge(dut.clk)
+    await ClockCycles(dut.clk, 5)  # Wait a few clock cycles after de-asserting reset
     dut.ena.value = 1
 
     # Main test logic
@@ -61,14 +61,15 @@ async def test_matrix_multiplier(dut):
         dut.ui_in.value = a_binary   # Directly accessing the signal, bypassing submodule reference
         dut.uio_in.value = b_binary
 
-        # Wait for a clock cycle to get the output
-        await RisingEdge(dut.clk)
+        # Wait for the results to be stable
+        await ClockCycles(dut.clk, 2)
 
         # Check results
         combined_result = (int(dut.uo_out.value) << 8) | int(dut.uio_out.value)
         assert combined_result == expected_out_binary, f"Error: for A={test_case['A']}, B={test_case['B']} - expected {test_case['expected_out']} but got {combined_result}"
 
     dut._log.info("All matrix multiplier tests passed!")
+
 
 
 
