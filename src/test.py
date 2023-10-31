@@ -25,7 +25,10 @@ async def test_matrix_multiplier(dut):
         dut.uio_in.value = test_case["B"]
         # Enable the multiplier
         dut.ena.value = 1
-        await RisingEdge(dut.clk, 5)  # Wait for a clock cycle to process the multiplication
+       
+        for _ in range(5):
+            await RisingEdge(dut.clk)
+            
         dut.ena.value = 0
 
         # Check the results
