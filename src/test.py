@@ -55,8 +55,8 @@ async def test_matrix_multiplier(dut):
         expected_out_binary = output_matrix_to_binary(test_case["expected_out"])
 
         # Assign the input values
-        dut.ui_in <= a_binary
-        dut.uio_in <= b_binary
+        dut.ui_in = a_binary
+        dut.uio_in = b_binary
 
         # Wait for a clock cycle to get the output
         await RisingEdge(dut.clk)
