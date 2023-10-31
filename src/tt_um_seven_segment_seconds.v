@@ -31,7 +31,7 @@ module tt_um_seven_segment_seconds(
                     (b11 > 2'b10) || (b12 > 2'b10) || (b21 > 2'b10) || (b22 > 2'b10);
 
 
-    always @(posedge clk or negedge rst_n) begin
+    always @(posedge clk) begin
         if (!rst_n) begin
             uo_out <= 8'b0;
             uio_out <= 8'b0;

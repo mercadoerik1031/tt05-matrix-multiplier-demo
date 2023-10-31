@@ -28,17 +28,21 @@ test_matrices = [
         "B": [[0, 1], [0, 0]],
         "expected_out": [[0, 0], [0, 0]]
     },
-    # Add other test cases as needed...
 ]
 
 @cocotb.test()
 async def test_matrix_multiplier(dut):
     """Test for matrix multiplication logic."""
+    dut._log.info("Starting matrix multiplier test")
+
+    # Start the clock
+    clock = Clock(dut.clk, 100, units="us")  # Assuming a 10 MHz clock frequency
+    cocotb.start_soon(clock.start())
 
     # Set initial values
     dut.ena.value = 0
-    dut.tt_um_seven_segment_seconds.ui_in.value = 0
-    dut.tt_um_seven_segment_seconds.uio_in.value = 0
+    dut.ui_in.value = 0   # Directly accessing the signal, bypassing submodule reference
+    dut.uio_in.value = 0
     dut.rst_n.value = 0
 
     # Apply reset
@@ -47,7 +51,6 @@ async def test_matrix_multiplier(dut):
     await RisingEdge(dut.clk)
     dut.ena.value = 1
 
-
     # Main test logic
     for test_case in test_matrices:
         a_binary = matrix_to_binary(test_case["A"])
@@ -55,8 +58,8 @@ async def test_matrix_multiplier(dut):
         expected_out_binary = output_matrix_to_binary(test_case["expected_out"])
 
         # Assign the input values
-        dut.tt_um_seven_segment_seconds.ui_in = a_binary
-        dut.tt_um_seven_segment_seconds.uio_in = b_binary
+        dut.ui_in.value = a_binary   # Directly accessing the signal, bypassing submodule reference
+        dut.uio_in.value = b_binary
 
         # Wait for a clock cycle to get the output
         await RisingEdge(dut.clk)
@@ -65,10 +68,10 @@ async def test_matrix_multiplier(dut):
         combined_result = (int(dut.uo_out.value) << 8) | int(dut.uio_out.value)
         assert combined_result == expected_out_binary, f"Error: for A={test_case['A']}, B={test_case['B']} - expected {test_case['expected_out']} but got {combined_result}"
 
-    # Add any cleanup or other operations here if necessary
-    # ...
-
+    dut._log.info("All matrix multiplier tests passed!")
     cocotb.result.passed("All matrix multiplier tests passed!")
+
+
 
 
 
