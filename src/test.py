@@ -69,7 +69,7 @@ async def test_matrix_multiplier(dut):
         assert combined_result == expected_out_binary, f"Error: for A={test_case['A']}, B={test_case['B']} - expected {test_case['expected_out']} but got {combined_result}"
 
     dut._log.info("All matrix multiplier tests passed!")
-    cocotb.result.passed("All matrix multiplier tests passed!")
+
 
 
 
