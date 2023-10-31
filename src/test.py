@@ -14,10 +14,9 @@ async def test_matrix_multiplier(dut):
     dut.rst_n.value = 1
 
     test_matrices = [
-    {"A": 0b0010001000100010, "B": 0b0010001000100010, "expected_out": 0b1000100010001000},
+    {"A": 0b00001010, "B": 0b00001010, "expected_out": 0b1000100010001000},
+    # Add more test cases as needed
 ]
-
-
 
     for test_case in test_matrices:
         # Set input values
