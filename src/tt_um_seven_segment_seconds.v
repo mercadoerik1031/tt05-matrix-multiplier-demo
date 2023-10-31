@@ -27,8 +27,9 @@ module tt_um_seven_segment_seconds(
     wire [1:0] b22 = uio_in[7:6];
 
     // Check all aij & bij in range [0, 2]
-    assign error_flag = (a11 > 2) || (a12 > 2) || (a21 > 2) || (a22 > 2) ||
-                        (b11 > 2) || (b12 > 2) || (b21 > 2) || (b22 > 2);
+    assign error_flag = (a11[2] == 1) || (a12[2] == 1) || (a21[2] == 1) || (a22[2] == 1) ||
+                    (b11[2] == 1) || (b12[2] == 1) || (b21[2] == 1) || (b22[2] == 1);
+
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin

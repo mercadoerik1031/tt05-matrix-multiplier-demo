@@ -15,8 +15,12 @@ async def test_matrix_multiplier(dut):
 
     test_matrices = [
     {"A": 0b00001010, "B": 0b00001010, "expected_out": 0b1000100010001000},
+    {"A": 0b00000010, "B": 0b00000010, "expected_out": 0b0000001000000010},  # Identity Matrix
+    {"A": 0b00000000, "B": 0b00000010, "expected_out": 0b0000000000000000},  # Zero Matrix
+    {"A": 0b00000001, "B": 0b00001000, "expected_out": 0b0000001000000010},  # Arbitrary Values
     # Add more test cases as needed
 ]
+
 
     for test_case in test_matrices:
         # Set input values
