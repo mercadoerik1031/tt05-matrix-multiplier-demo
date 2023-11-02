@@ -19,6 +19,7 @@ def output_matrix_to_binary(mat):
             binary_val |= mat[j][i]  # Note the reversed indices to match the Verilog output format
     return binary_val
 
+
 # Define your test matrices
 test_matrices = [
     {
