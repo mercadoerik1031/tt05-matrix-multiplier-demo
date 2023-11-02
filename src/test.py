@@ -24,9 +24,9 @@ def output_matrix_to_binary(mat):
 # Define your test matrices
 test_matrices = [
     {
-        "A": [[0, 1], [0, 0]],
-        "B": [[0, 1], [0, 0]],
-        "expected_out": [[0, 0], [0, 0]]
+        "A": [[2, 2], [2, 2]],
+        "B": [[2, 2], [2, 2]],
+        "expected_out": [[8, 8], [8, 8]]
     },
 ]
 
