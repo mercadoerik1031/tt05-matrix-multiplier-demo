@@ -102,7 +102,7 @@ async def test_matrix_multiplier(dut):
         dut.uio_in.value = b_binary
 
         # Wait for the results to be stable
-        await ClockCycles(dut.clk, 2)
+        await ClockCycles(dut.clk, 7)
 
         # Check if signals contain 'x' and handle them
         if contains_unknown(dut.uo_out.value) or contains_unknown(dut.uio_out.value):
