@@ -11,54 +11,46 @@
 */
 
 module seg7_decoder(
-    input [1:0] counter,
+    input [3:0] counter,
     output reg [6:0] segments
 );
 
     always @(*) begin
         case(counter)
-            2'b00: segments = 7'b0111111;  // 0
-            2'b01: segments = 7'b0000110;  // 1
-            2'b10: segments = 7'b1011011;  // 2
-            2'b11: segments = 7'b1001111;  // 3
-            default: segments = 7'b0000000; // Default to off
+            4'b0000: segments = 7'b0111111;  // 0
+            4'b0001: segments = 7'b0000110;  // 1
+            4'b0010: segments = 7'b1011011;  // 2
+            4'b0011: segments = 7'b1001111;  // 3
+            4'b0100: segments = 7'b1100110;  // 4
+            4'b0101: segments = 7'b1101101;  // 5
+            4'b0110: segments = 7'b1111101;  // 6
+            4'b0111: segments = 7'b0000111;  // 7
+            4'b1000: segments = 7'b1111111;  // 8
+            default: segments = 7'b0000000;  // Default to off
         endcase
     end
 
 endmodule
 
 module matrixC_to_segments(
-    input [7:0] matrixC,  
+    input [7:0] uio_out,  // Upper 8 bits of matrix C
+    input [7:0] uo_out,   // Lower 8 bits of matrix C
     output [6:0] seg1,  
     output [6:0] seg2,  
     output [6:0] seg3,  
-    output [6:0] seg4,  
-    output isNegative1, 
-    output isNegative2, 
-    output isNegative3, 
-    output isNegative4  
+    output [6:0] seg4
 );
 
-    wire [1:0] element1 = matrixC[1:0];
-    wire [1:0] element2 = matrixC[3:2];
-    wire [1:0] element3 = matrixC[5:4];
-    wire [1:0] element4 = matrixC[7:6];
-    
-    // Extract absolute values and signs
-    wire [3:0] absElement1 = (element1 < 0) ? -element1 : element1;
-    wire [3:0] absElement2 = (element2 < 0) ? -element2 : element2;
-    wire [3:0] absElement3 = (element3 < 0) ? -element3 : element3;
-    wire [3:0] absElement4 = (element4 < 0) ? -element4 : element4;
-
-    assign isNegative1 = (element1 < 0);
-    assign isNegative2 = (element2 < 0);
-    assign isNegative3 = (element3 < 0);
-    assign isNegative4 = (element4 < 0);
+    // Directly extract 4-bit elements from matrixC
+    wire [3:0] element1 = uio_out[3:0];
+    wire [3:0] element2 = uio_out[7:4];
+    wire [3:0] element3 = uo_out[3:0];
+    wire [3:0] element4 = uo_out[7:4];
     
     // Instantiate the 7-segment decoders
-    seg7_decoder decoder1(.counter(absElement1), .segments(seg1));
-    seg7_decoder decoder2(.counter(absElement2), .segments(seg2));
-    seg7_decoder decoder3(.counter(absElement3), .segments(seg3));
-    seg7_decoder decoder4(.counter(absElement4), .segments(seg4));
+    seg7_decoder decoder1(.counter(element1), .segments(seg1));
+    seg7_decoder decoder2(.counter(element2), .segments(seg2));
+    seg7_decoder decoder3(.counter(element3), .segments(seg3));
+    seg7_decoder decoder4(.counter(element4), .segments(seg4));
 
 endmodule

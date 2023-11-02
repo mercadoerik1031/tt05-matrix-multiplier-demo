@@ -21,7 +21,7 @@ def output_matrix_to_binary(mat):
             binary_val |= mat[i][j]
     return binary_val
 
-# Define your test matrices
+# Define test matrices
 test_matrices = [
     {
         "A": [[2, 2], [2, 2]],
