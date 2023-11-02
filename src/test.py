@@ -61,20 +61,20 @@ async def test_matrix_multiplier(dut):
     dut._log.info("Starting matrix multiplier test")
 
     # Start the clock
-    clock = Clock(dut.clk, 100, units="us")
+    clock = Clock(dut.clk, 100, units="ns")
     cocotb.start_soon(clock.start())
+
+    # Apply reset
+    await RisingEdge(dut.clk)
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 10)  # Wait a few clock cycles after de-asserting reset
+    dut.ena.value = 1
 
     # Set initial values
     dut.ena.value = 0
     dut.ui_in.value = 0
     dut.uio_in.value = 0
     dut.rst_n.value = 0
-
-    # Apply reset
-    await RisingEdge(dut.clk)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 5)  # Wait a few clock cycles after de-asserting reset
-    dut.ena.value = 1
 
     # Main test logic
     for test_case in test_matrices:
