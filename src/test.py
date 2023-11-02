@@ -66,7 +66,7 @@ async def test_matrix_multiplier(dut):
 
     # Set initial values
     dut.ena.value = 0
-    dut.ui_in.value = 0  # Directly accessing the signal, bypassing submodule reference
+    dut.ui_in.value = 0
     dut.uio_in.value = 0
     dut.rst_n.value = 0
 
