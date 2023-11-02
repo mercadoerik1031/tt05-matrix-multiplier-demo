@@ -28,27 +28,28 @@ module tt_um_seven_segment_seconds(
 
     // Check all aij & bij in range [0, 2]
     assign error_flag = (a11 > 2'b10) || (a12 > 2'b10) || (a21 > 2'b10) || (a22 > 2'b10) ||
-                        (b11 > 2'b10) || (b12 > 2'b10) || (b21 > 2'b10) || (b22 > 2'b10);
+                    (b11 > 2'b10) || (b12 > 2'b10) || (b21 > 2'b10) || (b22 > 2'b10);
 
-    reg [3:0] result11, result12, result21, result22;
 
-    reg [3:0] result11, result12, result21, result22;
-
-    always @(posedge clock) begin
-        if (reset) begin
-            // Reset logic
-        end
-        else begin
-            // Compute intermediate results
-            result11 = matrix_a[0] * matrix_b[0] + matrix_a[1] * matrix_b[2];
-            result12 = matrix_a[0] * matrix_b[1] + matrix_a[1] * matrix_b[3];
-            result21 = matrix_a[2] * matrix_b[0] + matrix_a[3] * matrix_b[2];
-            result22 = matrix_a[2] * matrix_b[1] + matrix_a[3] * matrix_b[3];
-
-            // Concatenate results
-            uo_out = {result11, result12};
-            uio_out = {result21, result22};
+    always @(posedge clk) begin
+        if (!rst_n) begin
+            uo_out <= 8'b0;
+            uio_out <= 8'b0;
+        end else if (ena) begin
+            if (error_flag) begin
+                uo_out <= 8'b0;
+                uio_out <= 8'b0;
+            end else begin
+                // 2 x 2 matrix multiplication logic
+                uo_out[3:0] <= a11 * b11 + a12 * b21;
+                uo_out[7:4] <= a11 * b12 + a12 * b22;
+                uio_out[3:0] <= a21 * b11 + a22 * b21;
+                uio_out[7:4] <= a21 * b12 + a22 * b22;
+            end
         end
     end
+
+    // Set uio_oe as outputs after multiplication
+    assign uio_oe = (ena) ? 8'b11111111 : 8'b00000000;
 
 endmodule
