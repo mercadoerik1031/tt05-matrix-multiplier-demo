@@ -4,7 +4,6 @@ from cocotb.triggers import RisingEdge, ClockCycles
 
 # Helper functions for matrix to binary conversions
 def matrix_to_binary(mat):
-    # Convert a 2x2 matrix to its binary representation.
     binary_val = 0
     for i in range(2):
         for j in range(2):
@@ -13,7 +12,6 @@ def matrix_to_binary(mat):
     return binary_val
 
 def output_matrix_to_binary(mat):
-    # Convert a 2x2 output matrix to its binary representation.
     binary_val = 0
     for i in range(2):
         for j in range(2):
@@ -28,6 +26,7 @@ test_matrices = [
         "B": [[2, 2], [2, 2]],
         "expected_out": [[8, 8], [8, 8]]
     },
+    # Add more test cases as needed
 ]
 
 @cocotb.test()
@@ -41,14 +40,14 @@ async def test_matrix_multiplier(dut):
 
     # Set initial values
     dut.ena.value = 0
-    dut.ui_in.value = 0   # Directly accessing the signal, bypassing submodule reference
+    dut.ui_in.value = 0
     dut.uio_in.value = 0
     dut.rst_n.value = 0
 
     # Apply reset
     await RisingEdge(dut.clk)
     dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 5)  # Wait a few clock cycles after de-asserting reset
+    await ClockCycles(dut.clk, 5)
     dut.ena.value = 1
 
     # Main test logic
@@ -58,15 +57,16 @@ async def test_matrix_multiplier(dut):
         expected_out_binary = output_matrix_to_binary(test_case["expected_out"])
 
         # Assign the input values
-        dut.ui_in.value = a_binary   # Directly accessing the signal, bypassing submodule reference
+        dut.ui_in.value = a_binary
         dut.uio_in.value = b_binary
 
-        # Wait for the results to be stable
+        # Wait for the result
         await ClockCycles(dut.clk, 2)
 
-        # Check results
-        combined_result = (int(dut.uo_out.value) << 8) | int(dut.uio_out.value)
-        dut._log.info(f"uo_out: {dut.uo_out.value}, uio_out: {dut.uio_out.value}, combined_result: {combined_result}")
-        assert combined_result == expected_out_binary, f"Error: for A={test_case['A']}, B={test_case['B']} - expected {test_case['expected_out']} but got {combined_result}"
+        # Combine the output vectors
+        actual_out = (int(dut.uo_out.value) << 8) | int(dut.uio_out.value)
 
-    dut._log.info("All matrix multiplier tests passed!")
+        # Check the result
+        assert actual_out == expected_out_binary, f"Matrix multiplication result was incorrect: {actual_out:#010b} != {expected_out_binary:#010b}"
+
+    dut._log.info("All tests passed")
