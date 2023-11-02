@@ -1,6 +1,7 @@
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
+from cocotb.binary import BinaryValue
 
 @cocotb.test()
 async def test_matrix_multiplier(dut):
@@ -35,8 +36,9 @@ async def test_matrix_multiplier(dut):
         
         # Check the output of the multiplier
         if not error_flag_out:
-            assert dut.uo_out.value == test_case['Expected'][8:], f"Upper output failed with A={test_case['A']}, B={test_case['B']}"
-            assert dut.uio_out.value == test_case['Expected'][:8], f"Lower output failed with A={test_case['A']}, B={test_case['B']}"
+            expected_bin = BinaryValue(test_case['Expected'], n_bits=32, bigEndian=False).binstr
+            assert dut.uo_out.value.binstr == expected_bin[-16:-8], f"Upper output failed with A={test_case['A']}, B={test_case['B']}"
+            assert dut.uio_out.value.binstr == expected_bin[-8:], f"Lower output failed with A={test_case['A']}, B={test_case['B']}"
             dut._log.info("Passed test with A=%s, B=%s, Expected=%s", test_case['A'], test_case['B'], test_case['Expected'])
         
         dut.ena.value = 0
