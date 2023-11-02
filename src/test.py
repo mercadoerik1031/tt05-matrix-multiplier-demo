@@ -2,71 +2,42 @@ import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
 
-# Helper functions for matrix to binary conversions
-def matrix_to_binary(mat):
-    # Convert a 2x2 matrix to its binary representation.
-    binary_val = 0
-    for i in range(2):
-        for j in range(2):
-            binary_val <<= 2
-            binary_val |= mat[i][j]
-    return binary_val
-
-def output_matrix_to_binary(mat):
-    # Convert a 2x2 output matrix to its binary representation.
-    binary_val = 0
-    for i in range(2):
-        for j in range(2):
-            binary_val <<= 4
-            binary_val |= mat[i][j]
-    return binary_val
-
-# Define your test matrices
-test_matrices = [
-    {
-        "A": [[2, 2], [2, 2]],
-        "B": [[2, 2], [2, 2]],
-        "expected_out": [[8, 8], [8, 8]]
-    },
-]
-
 @cocotb.test()
 async def test_matrix_multiplier(dut):
     """Test for matrix multiplication logic."""
     dut._log.info("Starting matrix multiplier test")
-
-    # Start the clock
-    clock = Clock(dut.clk, 100, units="us")
-    cocotb.start_soon(clock.start())
-
-    # Set initial values
-    dut.ena.value = 0
-    dut.ui_in.value = 0   # Directly accessing the signal, bypassing submodule reference
-    dut.uio_in.value = 0
+    
+    clock = Clock(dut.clk, 10, units="ns")  # 10ns period for a 100MHz clock
+    cocotb.start_soon(clock.start())        # Start the clock
+    
+    # Reset
     dut.rst_n.value = 0
-
-    # Apply reset
-    await RisingEdge(dut.clk)
+    dut.ena.value = 0
+    await ClockCycles(dut.clk, 5)
     dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 5)  # Wait a few clock cycles after de-asserting reset
-    dut.ena.value = 1
-
-    # Main test logic
+    
+    test_matrices = [
+        {'A': 0x1234, 'B': 0x5678, 'Expected': 0xE208},
+        {'A': 0xFFFF, 'B': 0x0001, 'Expected': 0xFFFF},
+    ]
+    
     for test_case in test_matrices:
-        a_binary = matrix_to_binary(test_case["A"])
-        b_binary = matrix_to_binary(test_case["B"])
-        expected_out_binary = output_matrix_to_binary(test_case["expected_out"])
-
-        # Assign the input values
-        dut.ui_in.value = a_binary   # Directly accessing the signal, bypassing submodule reference
-        dut.uio_in.value = b_binary
-
-        # Wait for the results to be stable
-        await ClockCycles(dut.clk, 2)
-
-        # Check results
-        combined_result = (int(dut.uo_out.value) << 8) | int(dut.uio_out.value)
-        dut._log.info(f"uo_out: {dut.uo_out.value}, uio_out: {dut.uio_out.value}, combined_result: {combined_result}")
-        assert combined_result == expected_out_binary, f"Error: for A={test_case['A']}, B={test_case['B']} - expected {test_case['expected_out']} but got {combined_result}"
-
-    dut._log.info("All matrix multiplier tests passed!")
+        dut.a.value = test_case['A']
+        dut.b.value = test_case['B']
+        dut.ena.value = 1
+        
+        await ClockCycles(dut.clk, 1)
+        
+        # Check for error flag
+        error_flag_out = dut.error_flag_out.value
+        assert error_flag_out == (test_case['Expected'] > 0xFFFF), f"Error flag incorrect for inputs A={test_case['A']}, B={test_case['B']}"
+        dut._log.info(f"Error Flag: {error_flag_out}")
+        
+        # Check the output of the multiplier
+        if not error_flag_out:
+            assert dut.uo_out.value == test_case['Expected'][8:], f"Upper output failed with A={test_case['A']}, B={test_case['B']}"
+            assert dut.uio_out.value == test_case['Expected'][:8], f"Lower output failed with A={test_case['A']}, B={test_case['B']}"
+            dut._log.info("Passed test with A=%s, B=%s, Expected=%s", test_case['A'], test_case['B'], test_case['Expected'])
+        
+        dut.ena.value = 0
+        await ClockCycles(dut.clk, 1)
