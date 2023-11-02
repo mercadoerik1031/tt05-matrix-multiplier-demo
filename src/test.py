@@ -21,6 +21,14 @@ def output_matrix_to_binary(mat):
             binary_val |= mat[i][j]
     return binary_val
 
+def binary_to_output_matrix(val):
+    # Convert binary representation back to a 2x2 matrix.
+    matrix = [[0, 0], [0, 0]]
+    for i in range(2):
+        for j in range(2):
+            matrix[i][j] = (val >> (4*(3-(i*2+j)))) & 0xF
+    return matrix
+
 # Define test matrices
 test_matrices = [
     {
@@ -28,6 +36,7 @@ test_matrices = [
         "B": [[2, 2], [2, 2]],
         "expected_out": [[8, 8], [8, 8]]
     },
+    # You can add more test cases here for comprehensive testing
 ]
 
 @cocotb.test()
@@ -66,7 +75,8 @@ async def test_matrix_multiplier(dut):
 
         # Check results
         combined_result = (int(dut.uo_out.value) << 8) | int(dut.uio_out.value)
+        result_matrix = binary_to_output_matrix(combined_result)
         dut._log.info(f"uo_out: {dut.uo_out.value}, uio_out: {dut.uio_out.value}, combined_result: {combined_result}")
-        assert combined_result == expected_out_binary, f"Error: for A={test_case['A']}, B={test_case['B']} - expected {test_case['expected_out']} but got {combined_result}"
+        assert combined_result == expected_out_binary, f"Error: for A={test_case['A']}, B={test_case['B']} - expected {test_case['expected_out']} but got {result_matrix}"
 
     dut._log.info("All matrix multiplier tests passed!")
