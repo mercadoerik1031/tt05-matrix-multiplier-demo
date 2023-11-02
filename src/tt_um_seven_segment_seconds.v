@@ -52,10 +52,3 @@ module tt_um_seven_segment_seconds(
     end
 
 endmodule
-
-
-
-    // Set uio_oe as outputs after multiplication
-    assign uio_oe = (ena) ? 8'b11111111 : 8'b00000000;
-
-endmodule
