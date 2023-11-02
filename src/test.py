@@ -62,12 +62,14 @@ async def test_matrix_multiplier(dut):
         dut.uio_in.value = b_binary
 
         # Wait for the result
-        await ClockCycles(dut.clk, 2)
+        await RisingEdge(dut.clock)
+    actual_out = int(dut.uo_out.value) << 8 | int(dut.uio_out.value)
 
-        # Combine the output vectors
-        actual_out = (int(dut.uo_out.value) << 8) | int(dut.uio_out.value)
+    # Print values for debugging
+    print(f"Expected Output: {expected_out_binary:#010b}")
+    print(f"Actual Output: {actual_out:#010b}")
 
-        # Check the result
-        assert actual_out == expected_out_binary, f"Matrix multiplication result was incorrect: {actual_out:#010b} != {expected_out_binary:#010b}"
+    # Assertion to check if the result is as expected
+    assert actual_out == expected_out_binary, f"Matrix multiplication result was incorrect: {actual_out:#010b} != {expected_out_binary:#010b}"
 
     dut._log.info("All tests passed")
