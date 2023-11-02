@@ -29,8 +29,8 @@ def binary_to_output_matrix(val):
             matrix[i][j] = (val >> (4*(3-(i*2+j)))) & 0xF
     return matrix
 
-def contains_unknown(value):
-    return 'x' in str(value)
+# def contains_unknown(value):
+#     return 'x' in str(value)
 
 test_matrices = [
     {
@@ -105,8 +105,8 @@ async def test_matrix_multiplier(dut):
         await ClockCycles(dut.clk, 7)
 
         # Check if signals contain 'x' and handle them
-        if contains_unknown(dut.uo_out.value) or contains_unknown(dut.uio_out.value):
-            continue
+        # if contains_unknown(dut.uo_out.value) or contains_unknown(dut.uio_out.value):
+        #     continue
 
         # combined_result = (int(dut.uo_out.value) << 8) | int(dut.uio_out.value)
         combined_result = (int(dut.uio_out.value) << 8) | int(dut.uo_out.value)
