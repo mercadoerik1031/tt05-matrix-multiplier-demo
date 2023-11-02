@@ -16,7 +16,7 @@ def output_matrix_to_binary(mat):
     for i in range(2):
         for j in range(2):
             binary_val <<= 4
-            binary_val |= mat[i][j]
+            binary_val |= mat[j][i]  # Note the reversed indices to match the Verilog output format
     return binary_val
 
 # Define your test matrices
