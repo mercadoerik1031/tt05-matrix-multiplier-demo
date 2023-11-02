@@ -31,41 +31,23 @@ module tt_um_seven_segment_seconds(
                     (b11 > 2'b10) || (b12 > 2'b10) || (b21 > 2'b10) || (b22 > 2'b10);
 
 
-    // always @(posedge clk) begin
-    //     if (!rst_n) begin
-    //         uo_out <= 8'b0;
-    //         uio_out <= 8'b0;
-    //     end else if (ena) begin
-    //         if (error_flag) begin
-    //             uo_out <= 8'b0;
-    //             uio_out <= 8'b0;
-    //         end else begin
-    //             // 2 x 2 matrix multiplication logic
-    //             uo_out[3:0] <= a11 * b11 + a12 * b21;
-    //             uo_out[7:4] <= a11 * b12 + a12 * b22;
-    //             uio_out[3:0] <= a21 * b11 + a22 * b21;
-    //             uio_out[7:4] <= a21 * b12 + a22 * b22;
-    //         end
-    //     end
-    // end
-
     always @(posedge clk) begin
-    if (!rst_n) begin
-        uo_out <= 8'b0;
-        uio_out <= 8'b0;
-    end else if (ena) begin
-        if (error_flag) begin
+        if (!rst_n) begin
             uo_out <= 8'b0;
             uio_out <= 8'b0;
-        end else begin
-            // 2 x 2 matrix multiplication logic
-            uo_out[3:0] <= (a11 * b11 + a12 * b21) & 4'b0011;
-            uo_out[7:4] <= (a11 * b12 + a12 * b22) & 4'b0011;
-            uio_out[3:0] <= (a21 * b11 + a22 * b21) & 4'b0011; 
-            uio_out[7:4] <= (a21 * b12 + a22 * b22) & 4'b0011; 
+        end else if (ena) begin
+            if (error_flag) begin
+                uo_out <= 8'b0;
+                uio_out <= 8'b0;
+            end else begin
+                // 2 x 2 matrix multiplication logic
+                uo_out[3:0] <= a11 * b11 + a12 * b21;
+                uo_out[7:4] <= a11 * b12 + a12 * b22;
+                uio_out[3:0] <= a21 * b11 + a22 * b21;
+                uio_out[7:4] <= a21 * b12 + a22 * b22;
+            end
         end
     end
-end
 
     // Set uio_oe as outputs after multiplication
     assign uio_oe = (ena) ? 8'b11111111 : 8'b00000000;
