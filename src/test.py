@@ -64,17 +64,17 @@ async def test_matrix_multiplier(dut):
     clock = Clock(dut.clk, 100, units="ns")
     cocotb.start_soon(clock.start())
 
-    # Apply reset
-    await RisingEdge(dut.clk)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 10)  # Wait a few clock cycles after de-asserting reset
-    dut.ena.value = 1
-
     # Set initial values
     dut.ena.value = 0
     dut.ui_in.value = 0
     dut.uio_in.value = 0
     dut.rst_n.value = 0
+
+    # Apply reset
+    await RisingEdge(dut.clk)
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 10)  # Wait a few clock cycles after de-asserting reset
+    dut.ena.value = 1
 
     # Main test logic
     for test_case in test_matrices:
@@ -87,7 +87,7 @@ async def test_matrix_multiplier(dut):
         dut.uio_in.value = b_binary
 
         # Wait for the results to be stable
-        await ClockCycles(dut.clk, 7)
+        await ClockCycles(dut.clk, 10)
 
         # Check if signals contain 'x' and handle them
         if contains_unknown(dut.uo_out.value) or contains_unknown(dut.uio_out.value):
