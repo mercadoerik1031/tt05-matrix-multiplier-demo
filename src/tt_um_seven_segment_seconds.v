@@ -1,35 +1,55 @@
+`default_nettype none
+
 module tt_um_seven_segment_seconds(
-    input              clk,
-    input              rst_n,
-    input              ena,
-    input      [15:0]  a,
-    input      [15:0]  b,
-    output reg [7:0]   uo_out,
-    output reg [7:0]   uio_out,
-    output reg         error_flag_out
+    input  wire [7:0] ui_in,
+    output reg  [7:0] uo_out,
+    input  wire [7:0] uio_in,
+    output reg  [7:0] uio_out,
+    output wire [7:0] uio_oe,
+    input  wire       ena,
+    input  wire       clk,
+    input  wire       rst_n
 );
 
-reg [31:0] product;
-reg error_flag;
+    wire reset = !rst_n;
+    wire error_flag;
+    
+    // Split ui_in for Matrix A elements (unsigned 2-bit numbers)
+    wire [1:0] a11 = ui_in[1:0];
+    wire [1:0] a12 = ui_in[3:2];
+    wire [1:0] a21 = ui_in[5:4];
+    wire [1:0] a22 = ui_in[7:6];
 
-always @(posedge clk) begin
-    if (!rst_n) begin
-        uo_out <= 8'b0;
-        uio_out <= 8'b0;
-        error_flag_out <= 0;
-    end else if (ena) begin
-        product = a * b;
-        error_flag = product[31:16] ? 1'b1 : 1'b0;
-        error_flag_out <= error_flag;
+    // Split uio_in for Matrix B elements (unsigned 2-bit numbers)
+    wire [1:0] b11 = uio_in[1:0];
+    wire [1:0] b12 = uio_in[3:2];
+    wire [1:0] b21 = uio_in[5:4];
+    wire [1:0] b22 = uio_in[7:6];
 
-        if (!error_flag) begin
-            uo_out <= product[15:8];
-            uio_out <= product[7:0];
-        end else begin
+    // Check all aij & bij in range [0, 2]
+    assign error_flag = (a11 > 2'b10) || (a12 > 2'b10) || (a21 > 2'b10) || (a22 > 2'b10) ||
+                    (b11 > 2'b10) || (b12 > 2'b10) || (b21 > 2'b10) || (b22 > 2'b10);
+
+
+    always @(posedge clk) begin
+        if (!rst_n) begin
             uo_out <= 8'b0;
             uio_out <= 8'b0;
+        end else if (ena) begin
+            if (error_flag) begin
+                uo_out <= 8'b0;
+                uio_out <= 8'b0;
+            end else begin
+                // 2 x 2 matrix multiplication logic
+                uo_out[3:0] <= a11 * b11 + a12 * b21;
+                uo_out[7:4] <= a11 * b12 + a12 * b22;
+                uio_out[3:0] <= a21 * b11 + a22 * b21;
+                uio_out[7:4] <= a21 * b12 + a22 * b22;
+            end
         end
     end
-end
+
+    // Set uio_oe as outputs after multiplication
+    assign uio_oe = (ena) ? 8'b11111111 : 8'b00000000;
 
 endmodule
