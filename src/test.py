@@ -108,7 +108,8 @@ async def test_matrix_multiplier(dut):
         if contains_unknown(dut.uo_out.value) or contains_unknown(dut.uio_out.value):
             continue
 
-        combined_result = (int(dut.uo_out.value) << 8) | int(dut.uio_out.value)
+        # combined_result = (int(dut.uo_out.value) << 8) | int(dut.uio_out.value)
+        combined_result = (int(dut.uio_out.value) << 8) | int(dut.uo_out.value)
         result_matrix = binary_to_output_matrix(combined_result)
         dut._log.info(f"uo_out: {dut.uo_out.value}, uio_out: {dut.uio_out.value}, combined_result: {combined_result}")
         assert combined_result == expected_out_binary, f"Error: for A={test_case['A']}, B={test_case['B']} - expected {test_case['expected_out']} but got {result_matrix}"
