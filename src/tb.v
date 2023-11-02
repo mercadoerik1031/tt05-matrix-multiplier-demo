@@ -25,17 +25,17 @@ module tb ();
     always #5 clk = ~clk;
 
     // Generate a reset signal (active low for a short duration, then remains high)
-    initial begin
-        #10;
-        rst_n = 1;
-        #10;
-        ena = 1;
-        // Example test stimuli
-        ui_in = 8'b00110011; // Example values for matrix A
-        uio_in = 8'b11001100; // Example values for matrix B
-        #20;
-        // Add more test cases as needed
-    end
+    // initial begin
+    //     #10;
+    //     rst_n = 1;
+    //     #10;
+    //     ena = 1;
+    //     // Example test stimuli
+    //     ui_in = 8'b00110011; // Example values for matrix A
+    //     uio_in = 8'b11001100; // Example values for matrix B
+    //     #20;
+    //     // Add more test cases as needed
+    // end
 
     tt_um_seven_segment_seconds tt_um_seven_segment_seconds (
         .ui_in      (ui_in),
