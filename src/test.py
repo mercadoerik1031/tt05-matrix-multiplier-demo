@@ -69,6 +69,8 @@ async def test_matrix_multiplier(dut):
     dut.ui_in.value = 0  # Directly accessing the signal, bypassing submodule reference
     dut.uio_in.value = 0
     dut.rst_n.value = 0
+    dut.uo_out.value = 0
+    dut.uio_out.value = 0
 
     # Apply reset
     await RisingEdge(dut.clk)
