@@ -61,23 +61,30 @@ async def test_matrix_multiplier(dut):
     dut._log.info("Starting matrix multiplier test")
 
     # Start the clock
+    await cocotb.triggers.Timer(100, units="ns")  # wait for 1 clock cycles
     clock = Clock(dut.clk, 100, units="ns")
     cocotb.start_soon(clock.start())
 
+    await RisingEdge(dut.clk)
     # Set initial values
     dut.ena.value = 0
     dut.ui_in.value = 0
     dut.uio_in.value = 0
     dut.rst_n.value = 0
+    dut.uo_out.value = 0
+    dut.uio_out.value = 0
 
-    # Apply reset
     await RisingEdge(dut.clk)
+    # Apply reset
     dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 10)  # Wait a few clock cycles after de-asserting reset
+    await ClockCycles(dut.clk, 4)  # Wait a few clock cycles after de-asserting reset
+
+    await RisingEdge(dut.clk)
     dut.ena.value = 1
 
     # Main test logic
     for test_case in test_matrices:
+        await RisingEdge(dut.clk)
         a_binary = matrix_to_binary(test_case["A"])
         b_binary = matrix_to_binary(test_case["B"])
         expected_out_binary = output_matrix_to_binary(test_case["expected_out"])
@@ -87,13 +94,13 @@ async def test_matrix_multiplier(dut):
         dut.uio_in.value = b_binary
 
         # Wait for the results to be stable
-        await ClockCycles(dut.clk, 10)
+        await ClockCycles(dut.clk, 4)
 
+        await RisingEdge(dut.clk)
         # Check if signals contain 'x' and handle them
         if contains_unknown(dut.uo_out.value) or contains_unknown(dut.uio_out.value):
             continue
 
-        # combined_result = (int(dut.uo_out.value) << 8) | int(dut.uio_out.value)
         combined_result = (int(dut.uio_out.value) << 8) | int(dut.uo_out.value)
         result_matrix = binary_to_output_matrix(combined_result)
         dut._log.info(
@@ -103,4 +110,6 @@ async def test_matrix_multiplier(dut):
             combined_result == expected_out_binary
         ), f"Error: for A={test_case['A']}, B={test_case['B']} - expected {test_case['expected_out']} but got {result_matrix}"
 
+    await RisingEdge(dut.clk)
     dut._log.info("All matrix multiplier tests passed!")
+
