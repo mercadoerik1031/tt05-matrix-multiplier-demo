@@ -65,9 +65,13 @@ async def test_matrix_multiplier(dut):
     cocotb.start_soon(clock.start())
 
     # Set initial values
-    dut.ena.value = 0
     dut.ui_in.value = 0 
     dut.uio_in.value = 0
+
+    dut.uo_out.value = 0
+    dut.uio_out.value = 0
+    
+    dut.ena.value = 0
     dut.rst_n.value = 0
 
     # Apply reset
