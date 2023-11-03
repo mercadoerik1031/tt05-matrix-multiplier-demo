@@ -70,14 +70,17 @@ async def test_matrix_multiplier(dut):
     dut.ena.value = 0
     dut.ui_in.value = 0
     dut.uio_in.value = 0
-    dut.rst_n.value = 0
+
     dut.uo_out.value = 0
     dut.uio_out.value = 0
 
+    dut.ena.value = 0
+
+    dut.rst_n.value = 0
     await RisingEdge(dut.clk)
     # Apply reset
     dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 4)  # Wait a few clock cycles after de-asserting reset
+    await ClockCycles(dut.clk, 5)  # Wait a few clock cycles after de-asserting reset
 
     await RisingEdge(dut.clk)
     dut.ena.value = 1
@@ -94,7 +97,7 @@ async def test_matrix_multiplier(dut):
         dut.uio_in.value = b_binary
 
         # Wait for the results to be stable
-        await ClockCycles(dut.clk, 4)
+        await ClockCycles(dut.clk, 5)
 
         await RisingEdge(dut.clk)
         # Check if signals contain 'x' and handle them
