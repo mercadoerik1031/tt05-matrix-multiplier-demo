@@ -14,7 +14,7 @@ module tb ();
     wire [7:0] uio_out;
     wire [7:0] uio_oe;
 
-    // this part dumps the trace to a vcd file that can be viewed with GTKWave
+    // dumps a vcd file
     initial begin
         $dumpfile ("tb.vcd");
         $dumpvars (0, tb);
